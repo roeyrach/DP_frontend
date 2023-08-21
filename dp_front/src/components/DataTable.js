@@ -1,32 +1,47 @@
 import React, { useEffect, useState } from "react"
-import { DataGrid } from "@mui/x-data-grid"
-import { getProducts, addProduct } from "../HttpRequests"
+import { DataGrid, useGridApiRef } from "@mui/x-data-grid"
+import { getRowIdFromRowModel } from "@mui/x-data-grid/internals"
 
-const c = [
+const columns = [
 	{ field: "id", headerName: "ID" },
-	{ field: "name", headerName: "Name" },
-	{ field: "sku", headerName: "SKU" },
-	{ field: "desc", headerName: "Description", sortable: false },
-	{ field: "type", headerName: "Type" },
-	{ field: "date", headerName: "Date", width: 150, type: "Date" },
+	{ field: "name", headerName: "Name", editable: true },
+	{ field: "sku", headerName: "SKU", editable: true },
+	{ field: "desc", headerName: "Description", sortable: false, editable: true },
+	{ field: "type", headerName: "Type", editable: true },
+	{
+		field: "date",
+		headerName: "Date",
+		width: 150,
+		type: "Date",
+		editable: true,
+	},
 ]
 
-// const r = [
-// 	{
-// 		id: 1,
-// 		name: "Roey",
-// 		sku: "1654",
-// 		desc: "handsome",
-// 		type: "man",
-// 		date: new Date(),
-// 	},
-// ]
-export default function DataTable({ products }) {
+export default function DataTable({ products, setProducts }) {
+	const apiRef = useGridApiRef()
+
+	const handleRowClick = (params) => {
+		console.log("Clicked Row ID:", params.id)
+	}
+
+	const deleteRows = () => {
+		const selectedRowKeys = Array.from(apiRef.current.getSelectedRows().keys())
+		const updatedProducts = products.filter((row) => {
+			return !selectedRowKeys.includes(row.id)
+		})
+		const productsWithIndex = updatedProducts.map((product, index) => ({
+			...product,
+			id: index + 1,
+		}))
+		setProducts(productsWithIndex)
+	}
+
 	return (
 		<div style={{ height: "auto", width: "100%" }}>
+			<button onClick={() => deleteRows()}>delete</button>
 			<DataGrid
 				rows={products}
-				columns={c}
+				columns={columns}
 				initialState={{
 					pagination: {
 						paginationModel: { page: 0, pageSize: 5 },
@@ -34,7 +49,10 @@ export default function DataTable({ products }) {
 				}}
 				pageSizeOptions={[5, 10]}
 				checkboxSelection
-			/>
+				disableRowSelectionOnClick={false}
+				onRowClick={handleRowClick}
+				apiRef={apiRef}
+			></DataGrid>
 		</div>
 	)
 }
