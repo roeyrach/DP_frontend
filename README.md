@@ -18,3 +18,13 @@ These instructions will help you set up and run the project on your local machin
 4.   ```bash
       npm start
    
+
+###Videos
+
+
+https://github.com/roeyrach/DP_frontend/assets/93585090/898bc024-ce01-45ec-a4b1-da1d4f2ed705
+
+
+
+https://github.com/roeyrach/DP_frontend/assets/93585090/bab05c53-382f-43c6-ad91-a4dad29f5d3f
+
