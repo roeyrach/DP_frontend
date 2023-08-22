@@ -1,9 +1,50 @@
 import React, { useEffect, useState } from "react"
 import Button from "@mui/material/Button"
 import EditIcon from "@mui/icons-material/Edit"
-import { DataGrid, useGridApiRef, GridActionsCellItem } from "@mui/x-data-grid"
+import {
+	DataGrid,
+	useGridApiRef,
+	GridActionsCellItem,
+	gridClasses,
+} from "@mui/x-data-grid"
 import { getProducts, saveProducts } from "../HttpRequests"
 import FormDialog from "./FormDialog"
+import { alpha, styled } from "@mui/material/styles"
+
+const ODD_OPACITY = 0.2
+
+const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
+	[`& .${gridClasses.row}.even`]: {
+		backgroundColor: theme.palette.grey[200],
+		"&:hover, &.Mui-hovered": {
+			backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY),
+			"@media (hover: none)": {
+				backgroundColor: "transparent",
+			},
+		},
+		"&.Mui-selected": {
+			backgroundColor: alpha(
+				theme.palette.primary.main,
+				ODD_OPACITY + theme.palette.action.selectedOpacity
+			),
+			"&:hover, &.Mui-hovered": {
+				backgroundColor: alpha(
+					theme.palette.primary.main,
+					ODD_OPACITY +
+						theme.palette.action.selectedOpacity +
+						theme.palette.action.hoverOpacity
+				),
+				// Reset on touch devices, it doesn't add specificity
+				"@media (hover: none)": {
+					backgroundColor: alpha(
+						theme.palette.primary.main,
+						ODD_OPACITY + theme.palette.action.selectedOpacity
+					),
+				},
+			},
+		},
+	},
+}))
 
 function Products() {
 	const [products, setProducts] = useState([])
@@ -35,9 +76,7 @@ function Products() {
 		renderProducts()
 	}, [])
 
-	useEffect(() => {
-		console.log("Updated products:", products)
-	}, [products])
+	useEffect(() => {}, [products])
 
 	const addNewProduct = () => {
 		setLabel("Add Product")
@@ -46,17 +85,23 @@ function Products() {
 
 	const deleteRows = () => {
 		const selectedRowKeys = Array.from(apiRef.current.getSelectedRows().keys())
-		console.log(selectedRowKeys)
-		const updatedProducts = products.filter((row) => {
-			return !selectedRowKeys.includes(row.id)
-		})
-		const productsWithIndex = updatedProducts.map((product, index) => ({
-			...product,
-			id: index + 1,
-		}))
-		setProducts(productsWithIndex)
-		console.log(products, productsWithIndex)
-		apiRef.current.setRowSelectionModel([])
+
+		if (selectedRowKeys.length === 0) alert("No selected products")
+		else {
+			const updatedProducts = products.filter((row) => {
+				return !selectedRowKeys.includes(row.id)
+			})
+			const productsWithIndex = updatedProducts.map((product, index) => ({
+				...product,
+				id: index + 1,
+			}))
+
+			const confirmExit = window.confirm("Are you sure you want to delete?")
+			if (confirmExit) {
+				setProducts(productsWithIndex)
+				apiRef.current.setRowSelectionModel([])
+			}
+		}
 	}
 
 	const handleEdit = (id) => {
@@ -67,15 +112,12 @@ function Products() {
 
 	const handleSave = () => {
 		const productsWithoutId = products.map(({ id, ...product }) => product)
-		console.log("before:", productsWithoutId)
-
 		saveProducts(productsWithoutId)
 			.then((pros) => {
 				const updatedPros = pros.map((product, index) => ({
 					...product,
 					id: index + 1,
 				}))
-				console.log("after:", updatedPros)
 				setProducts(updatedPros)
 				alert("The changes has been saved successfully!")
 			})
@@ -94,7 +136,7 @@ function Products() {
 	}
 
 	const columns = [
-		{ field: "id", headerName: "ID" },
+		{ field: "id", headerName: "ID", headerClassName: "super-app-theme--header" },
 		{ field: "name", headerName: "Name" },
 		{ field: "sku", headerName: "SKU" },
 		{
@@ -113,7 +155,7 @@ function Products() {
 		{
 			field: "actions",
 			type: "actions",
-			headerName: "Actions",
+			headerName: "Edit",
 			width: 100,
 			cellClassName: "actions",
 			getActions: ({ id }) => {
@@ -159,7 +201,7 @@ function Products() {
 				</Button>
 				<Button
 					style={btnStyle}
-					onClick={handleSave}
+					onClick={() => handleSave()}
 					size="small"
 					variant="outlined"
 				>
@@ -167,7 +209,7 @@ function Products() {
 				</Button>
 				<Button
 					style={btnStyle}
-					onClick={handleExit}
+					onClick={() => handleExit()}
 					size="small"
 					variant="outlined"
 				>
@@ -175,8 +217,13 @@ function Products() {
 				</Button>
 			</div>
 
-			<div style={{ height: "auto", backgroundColor: "white" }}>
-				<DataGrid
+			<div
+				style={{
+					height: "auto",
+					backgroundColor: "white",
+				}}
+			>
+				<StripedDataGrid
 					rows={products}
 					columns={columns}
 					initialState={{
@@ -188,7 +235,10 @@ function Products() {
 					checkboxSelection
 					disableRowSelectionOnClick={true}
 					apiRef={apiRef}
-				></DataGrid>
+					getRowClassName={(params) =>
+						params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+					}
+				></StripedDataGrid>
 			</div>
 			<FormDialog
 				open={isDialogOpen}
