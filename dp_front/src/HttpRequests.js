@@ -14,22 +14,22 @@ export const getProducts = async () => {
 	}
 }
 
-export const addProduct = async (product) => {
+export const saveProducts = async (products) => {
 	try {
-		const response = await fetch(url + "/addProduct", {
-			method: "POST",
+		const response = await fetch(url + "/saveProducts", {
+			method: "PATCH",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(product),
+			body: JSON.stringify(products),
 		})
 
 		if (response.ok) {
-			const addedProduct = await response.json()
-			return addedProduct
+			const data = await response.json()
+			return data
 		} else {
-			throw new Error("Failed to add product", response.status)
+			throw new Error("Failed to save products")
 		}
 	} catch (error) {
-		console.error("Error adding product:", error)
+		console.error("Error saving products:", error)
 		throw error
 	}
 }

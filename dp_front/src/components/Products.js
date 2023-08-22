@@ -1,29 +1,21 @@
 import React, { useEffect, useState } from "react"
 import Button from "@mui/material/Button"
-import { DataGrid, useGridApiRef } from "@mui/x-data-grid"
-import { getProducts, addProduct } from "../HttpRequests"
+import EditIcon from "@mui/icons-material/Edit"
+import { DataGrid, useGridApiRef, GridActionsCellItem } from "@mui/x-data-grid"
+import { getProducts, saveProducts } from "../HttpRequests"
 import FormDialog from "./FormDialog"
-
-const columns = [
-	{ field: "id", headerName: "ID" },
-	{ field: "name", headerName: "Name", editable: true },
-	{ field: "sku", headerName: "SKU", editable: true },
-	{ field: "desc", headerName: "Description", sortable: false, editable: true },
-	{ field: "type", headerName: "Type", editable: true },
-	{
-		field: "date",
-		headerName: "Date",
-		width: 150,
-		type: "Date",
-		editable: true,
-	},
-]
 
 function Products() {
 	const [products, setProducts] = useState([])
 	const [isDialogOpen, setIsDialogOpen] = useState(false)
-	const [editProduct, setEditProduct] = useState({})
+	const [idEditProduct, setIdEditProduct] = useState(0)
+	const [label, setLabel] = useState("")
 	const apiRef = useGridApiRef()
+	const btnStyle = {
+		backgroundColor: "white",
+		border: "none",
+		fontWeight: "bold",
+	}
 
 	const renderProducts = async () => {
 		try {
@@ -44,29 +36,11 @@ function Products() {
 	}, [])
 
 	useEffect(() => {
-		console.log("addeddddddddd")
+		console.log("Updated products:", products)
 	}, [products])
 
-	// useEffect(() => {
-	// 	handleEdit()
-	// }, [editProduct])
-
 	const addNewProduct = () => {
-		// const newProduct = {
-		// 	name: "haim",
-		// 	sku: "1654",
-		// 	desc: "handsome",
-		// 	type: "man",
-		// 	date: new Date(),
-		// }
-		// addProduct(newProduct)
-		// 	.then(() => {
-		// 		setProducts([...products, { newProduct, id: products.length + 1 }]) // Update products array with the new product
-		// 	})
-		// 	.then(() => renderProducts())
-		// 	.catch((error) => {
-		// 		console.error("Error adding product:", error)
-		// 	})
+		setLabel("Add Product")
 		setIsDialogOpen(true)
 	}
 
@@ -81,59 +55,127 @@ function Products() {
 			id: index + 1,
 		}))
 		setProducts(productsWithIndex)
+		console.log(products, productsWithIndex)
 		apiRef.current.setRowSelectionModel([])
 	}
 
-	// const handleEdit = () => {
-	// 	const selectedRowKeys = Array.from(apiRef.current.getSelectedRows().keys())
-	// 	if (selectedRowKeys.length === 1) {
-	// 		setIsDialogOpen(true)
-	// 		alert("can edit now")
-	// 		const productIdToEdit = selectedRowKeys[0]
+	const handleEdit = (id) => {
+		setLabel("Edit Product")
+		setIdEditProduct(id)
+		setIsDialogOpen(true)
+	}
 
-	// 		const productIndexToEdit = products.findIndex(
-	// 			(product) => product.id === productIdToEdit
-	// 		)
+	const handleSave = () => {
+		const productsWithoutId = products.map(({ id, ...product }) => product)
+		console.log("before:", productsWithoutId)
 
-	// 		const idToEdit = parseInt(selectedRowKeys[0])
+		saveProducts(productsWithoutId)
+			.then((pros) => {
+				const updatedPros = pros.map((product, index) => ({
+					...product,
+					id: index + 1,
+				}))
+				console.log("after:", updatedPros)
+				setProducts(updatedPros)
+				alert("The changes has been saved successfully!")
+			})
+			.catch((error) => {
+				console.error("Error adding product:", error)
+			})
+	}
 
-	// 		if (productIndexToEdit !== -1) {
-	// 			const updatedProductList = [...products] // Create a shallow copy of the products array
-	// 			updatedProductList[productIndexToEdit] = {
-	// 				name: "roey",
-	// 				sku: "7777",
-	// 				desc: "tall",
-	// 				type: "manly",
-	// 				date: new Date(),
-	// 				id: idToEdit,
-	// 			}
+	const handleExit = () => {
+		const confirmExit = window.confirm(
+			"If you have unsaved changes that will be lost."
+		)
+		if (confirmExit) {
+			window.location.href = "https://www.google.com"
+		}
+	}
 
-	// 			setProducts(updatedProductList)
-	// 			setIsDialogOpen(false)
-	// 		}
-	// 	} else {
-	// 		alert("You have to select only one item to edit")
-	// 	}
-	// 	setIsDialogOpen(false)
-	// }
+	const columns = [
+		{ field: "id", headerName: "ID" },
+		{ field: "name", headerName: "Name" },
+		{ field: "sku", headerName: "SKU" },
+		{
+			field: "desc",
+			headerName: "Description",
+			width: 200,
+			sortable: false,
+		},
+		{ field: "type", headerName: "Type" },
+		{
+			field: "date",
+			headerName: "Date",
+			width: 150,
+			type: "Date",
+		},
+		{
+			field: "actions",
+			type: "actions",
+			headerName: "Actions",
+			width: 100,
+			cellClassName: "actions",
+			getActions: ({ id }) => {
+				return [
+					<GridActionsCellItem
+						icon={<EditIcon />}
+						label="Edit"
+						className="textPrimary"
+						onClick={() => handleEdit(id)}
+						color="inherit"
+					/>,
+				]
+			},
+		},
+	]
 
 	return (
-		<div>
-			<h1>Products</h1>
-			<Button onClick={() => addNewProduct()} size="small" variant="outlined">
-				Add new
-			</Button>
-			<Button onClick={() => deleteRows()} size="small" variant="outlined">
-				Delete
-			</Button>
-			<Button size="small" variant="outlined">
-				Edit
-			</Button>
-			<Button size="small" variant="outlined">
-				save
-			</Button>
+		<div style={{ width: "95%", margin: "0 auto", textAlign: "center" }}>
+			<div
+				style={{
+					display: "flex",
+					alignItems: "center",
+					flexDirection: "row",
+					gap: 10,
+				}}
+			>
+				<h1>Products</h1>
+				<Button
+					style={btnStyle}
+					onClick={() => addNewProduct()}
+					size="small"
+					variant="outlined"
+				>
+					Add new
+				</Button>
+				<Button
+					style={btnStyle}
+					onClick={() => deleteRows()}
+					size="small"
+					variant="outlined"
+				>
+					Delete
+				</Button>
+				<Button
+					style={btnStyle}
+					onClick={handleSave}
+					size="small"
+					variant="outlined"
+				>
+					save
+				</Button>
+				<Button
+					style={btnStyle}
+					onClick={handleExit}
+					size="small"
+					variant="outlined"
+				>
+					Exit
+				</Button>
+			</div>
 
-			<div style={{ height: "auto", width: "100%" }}>
+			<div style={{ height: "auto", backgroundColor: "white" }}>
 				<DataGrid
 					rows={products}
 					columns={columns}
@@ -151,9 +193,10 @@ function Products() {
 			<FormDialog
 				open={isDialogOpen}
 				setIsDialogOpen={setIsDialogOpen}
-				setEditProduct={setEditProduct}
 				setProducts={setProducts}
 				products={products}
+				label={label}
+				idEditProduct={idEditProduct}
 			/>
 		</div>
 	)

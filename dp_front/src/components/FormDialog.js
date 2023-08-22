@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import Button from "@mui/material/Button"
-import TextField from "@mui/material/TextField"
 import Dialog from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
@@ -8,11 +7,12 @@ import DialogContentText from "@mui/material/DialogContentText"
 import DialogTitle from "@mui/material/DialogTitle"
 
 export default function FormDialog({
+	label,
 	open,
 	setIsDialogOpen,
-	setEditProduct,
 	setProducts,
 	products,
+	idEditProduct,
 }) {
 	const [name, setName] = useState("")
 	const [sku, setSku] = useState(0)
@@ -20,17 +20,35 @@ export default function FormDialog({
 	const [type, setType] = useState("")
 	const [date, setDate] = useState(new Date() + "")
 	const [isSaveBtn, setIsSaveBtn] = useState(true)
+
+	useEffect(() => {
+		if (label === "Edit Product") {
+			const { name, sku, desc, type, date } = products.find(
+				(product) => product.id === idEditProduct
+			)
+			setName(name)
+			setSku(sku)
+			setDescription(desc)
+			setType(type)
+			setDate(date)
+		}
+	}, [label, idEditProduct, open])
+
 	// Calculate the date one week ago
-	const oneWeekAgo = new Date()
-	oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+	const oneWeekAgo = useMemo(() => {
+		const date = new Date()
+		date.setDate(date.getDate() - 7)
+		return date
+	}, [])
 
 	useEffect(() => {
 		// Update date state with the calculated value
 		setDate(oneWeekAgo.toISOString().slice(0, 10))
-	}, [])
+	}, [oneWeekAgo])
 
 	const handleClose = () => {
-		setIsDialogOpen(false)
+		// Close the dialog
+		clearForm()
 	}
 
 	const handleSave = () => {
@@ -42,26 +60,49 @@ export default function FormDialog({
 			date: date,
 			id: products.length + 1,
 		}
-		console.log(addedProduct)
-		setProducts([...products, addedProduct])
-
+		if (label === "Add Product") {
+			setProducts([...products, addedProduct])
+		} else {
+			const productIndex = products.findIndex(
+				(product) => product.id === idEditProduct
+			)
+			if (productIndex !== -1) {
+				const updatedProducts = [...products]
+				updatedProducts[productIndex] = addedProduct
+				addedProduct.id = productIndex + 1
+				setProducts(updatedProducts)
+			}
+		}
 		// Close the dialog
-		setIsDialogOpen(false)
+		clearForm()
 	}
 
-	// Update isSaveBtn based on the conditions
+	const clearForm = () => {
+		setIsDialogOpen(false)
+		setName("")
+		setSku(0)
+		setDescription("")
+		setType("")
+	}
+
 	useEffect(() => {
-		if (name !== "" && sku !== 0) {
+		if (
+			name !== "" &&
+			sku > 0 &&
+			type !== "" &&
+			description !== "" &&
+			date !== ""
+		) {
 			setIsSaveBtn(false)
 		} else {
 			setIsSaveBtn(true)
 		}
-	}, [name, sku])
+	}, [name, sku, type, description, date])
 
 	return (
 		<div>
 			<Dialog open={open}>
-				<DialogTitle>Add Product</DialogTitle>
+				<DialogTitle>{label}</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
 						The Name and the SKU field are mandatory.
@@ -90,10 +131,13 @@ export default function FormDialog({
 								setType(e.target.value)
 							}}
 						>
-							<option value="volvo">Volvo</option>
-							<option value="saab">Saab</option>
-							<option value="mercedes">Mercedes</option>
-							<option value="audi">Audi</option>
+							<option value="" disabled>
+								Select a type
+							</option>{" "}
+							{/* Placeholder option */}
+							<option value="Fruit">Fruit</option>
+							<option value="Vegtable">Vegtable</option>
+							<option value="Field Crops">Field Crops</option>
 						</select>
 						<input
 							type="date"
