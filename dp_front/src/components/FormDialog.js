@@ -110,9 +110,7 @@ export default function FormDialog({
 			<Dialog open={open}>
 				<DialogTitle>{label}</DialogTitle>
 				<DialogContent>
-					<DialogContentText>
-						The Name and the SKU field are mandatory.
-					</DialogContentText>
+					<DialogContentText>Fill the fields</DialogContentText>
 					<div>
 						<input
 							value={name}
