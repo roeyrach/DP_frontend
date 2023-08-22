@@ -19,12 +19,8 @@ These instructions will help you set up and run the project on your local machin
       npm start
    
 
-### Videos
+### Video
 
+https://github.com/roeyrach/DP_frontend/assets/93585090/e61ead11-2381-4a3b-87c0-a7de346c3ab5
 
-https://github.com/roeyrach/DP_frontend/assets/93585090/898bc024-ce01-45ec-a4b1-da1d4f2ed705
-
-
-
-https://github.com/roeyrach/DP_frontend/assets/93585090/bab05c53-382f-43c6-ad91-a4dad29f5d3f
 
