@@ -9,14 +9,12 @@ These instructions will help you set up and run the project on your local machin
 ### Start The Project
 
 1. Clone the repository to your local machine and then run on terminal:
+   
+2.  ```bash
+      cd .\dp_front\
+3.   ```bash
+      npm install
 
-   ```bash
-   cd .\dp_front\
-    ```
-   ```bash
-   npm install
-   ```
-
-   ```bash
-   npm start
-   ```
+4.   ```bash
+      npm start
+   
