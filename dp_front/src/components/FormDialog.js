@@ -31,6 +31,12 @@ export default function FormDialog({
 			setDescription(desc)
 			setType(type)
 			setDate(date)
+		} else {
+			setName("")
+			setSku(0)
+			setDescription("")
+			setType("")
+			setDate(oneWeekAgo.toISOString().slice(0, 10))
 		}
 	}, [label, idEditProduct, open])
 
