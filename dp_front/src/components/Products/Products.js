@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react"
 import Button from "@mui/material/Button"
 import EditIcon from "@mui/icons-material/Edit"
-import {
-	DataGrid,
-	useGridApiRef,
-	GridActionsCellItem,
-	gridClasses,
-} from "@mui/x-data-grid"
-import { getProducts, saveProducts } from "../HttpRequests"
-import FormDialog from "./FormDialog"
+import AddIcon from "@mui/icons-material/Add"
+import DeleteIcon from "@mui/icons-material/Delete"
+import SaveIcon from "@mui/icons-material/Save"
+import LogoutIcon from "@mui/icons-material/Logout"
+import { DataGrid, useGridApiRef, GridActionsCellItem, gridClasses } from "@mui/x-data-grid"
+import { getProducts, saveProducts } from "../../HttpRequests"
+import FormDialog from "../FormDialog/FormDialog"
 import { alpha, styled } from "@mui/material/styles"
+import "./Producs.css"
 
 const ODD_OPACITY = 0.2
 
@@ -23,23 +23,15 @@ const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
 			},
 		},
 		"&.Mui-selected": {
-			backgroundColor: alpha(
-				theme.palette.primary.main,
-				ODD_OPACITY + theme.palette.action.selectedOpacity
-			),
+			backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY + theme.palette.action.selectedOpacity),
 			"&:hover, &.Mui-hovered": {
 				backgroundColor: alpha(
 					theme.palette.primary.main,
-					ODD_OPACITY +
-						theme.palette.action.selectedOpacity +
-						theme.palette.action.hoverOpacity
+					ODD_OPACITY + theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity
 				),
 				// Reset on touch devices, it doesn't add specificity
 				"@media (hover: none)": {
-					backgroundColor: alpha(
-						theme.palette.primary.main,
-						ODD_OPACITY + theme.palette.action.selectedOpacity
-					),
+					backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY + theme.palette.action.selectedOpacity),
 				},
 			},
 		},
@@ -57,6 +49,7 @@ function Products() {
 		border: "none",
 		fontWeight: "bold",
 	}
+	const headerClassName = "super-app-theme--header"
 
 	const renderProducts = async () => {
 		try {
@@ -76,7 +69,7 @@ function Products() {
 		renderProducts()
 	}, [])
 
-	useEffect(() => {}, [products])
+	// useEffect(() => {}, [products])
 
 	const addNewProduct = () => {
 		setLabel("Add Product")
@@ -127,30 +120,43 @@ function Products() {
 	}
 
 	const handleExit = () => {
-		const confirmExit = window.confirm(
-			"If you have unsaved changes that will be lost."
-		)
+		const confirmExit = window.confirm("If you have unsaved changes that will be lost.")
 		if (confirmExit) {
 			window.location.href = "https://www.google.com"
 		}
 	}
 
 	const columns = [
-		{ field: "id", headerName: "ID", headerClassName: "super-app-theme--header" },
-		{ field: "name", headerName: "Name" },
-		{ field: "sku", headerName: "SKU" },
+		{ field: "id", headerName: "ID", headerClassName: headerClassName },
+		{ field: "name", headerName: "Name", headerClassName: headerClassName, cellClassName: "name" },
+		{ field: "sku", headerName: "SKU", headerClassName: headerClassName, cellClassName: "sku" },
 		{
 			field: "desc",
 			headerName: "Description",
 			width: 200,
 			sortable: false,
+			headerClassName: headerClassName,
 		},
-		{ field: "type", headerName: "Type" },
+		{
+			field: "type",
+			headerName: "Type",
+			headerClassName: headerClassName,
+			cellClassName: (params) => {
+				if (params.value === "Fruit") {
+					return "fruit"
+				} else if (params.value === "Field Crops") {
+					return "field-crops"
+				} else {
+					return "vegetable"
+				}
+			},
+		},
 		{
 			field: "date",
 			headerName: "Date",
 			width: 150,
 			type: "Date",
+			headerClassName: headerClassName,
 		},
 		{
 			field: "actions",
@@ -161,7 +167,7 @@ function Products() {
 			getActions: ({ id }) => {
 				return [
 					<GridActionsCellItem
-						icon={<EditIcon />}
+						icon={<EditIcon className="edit-icon" />}
 						label="Edit"
 						className="textPrimary"
 						onClick={() => handleEdit(id)}
@@ -169,60 +175,29 @@ function Products() {
 					/>,
 				]
 			},
+			headerClassName: headerClassName,
 		},
 	]
 
 	return (
-		<div style={{ width: "95%", margin: "0 auto", textAlign: "center" }}>
-			<div
-				style={{
-					display: "flex",
-					alignItems: "center",
-					flexDirection: "row",
-					gap: 10,
-				}}
-			>
+		<div className="container">
+			<div className="header">
 				<h1>Products</h1>
-				<Button
-					style={btnStyle}
-					onClick={() => addNewProduct()}
-					size="small"
-					variant="outlined"
-				>
+				<Button startIcon={<AddIcon />} className="button" style={btnStyle} onClick={() => addNewProduct()} size="small" variant="outlined">
 					Add new
 				</Button>
-				<Button
-					style={btnStyle}
-					onClick={() => deleteRows()}
-					size="small"
-					variant="outlined"
-				>
+				<Button startIcon={<DeleteIcon />} className="button" style={btnStyle} onClick={() => deleteRows()} size="small" variant="outlined">
 					Delete
 				</Button>
-				<Button
-					style={btnStyle}
-					onClick={() => handleSave()}
-					size="small"
-					variant="outlined"
-				>
-					save
+				<Button startIcon={<SaveIcon />} className="button" style={btnStyle} onClick={() => handleSave()} size="small" variant="outlined">
+					Save
 				</Button>
-				<Button
-					style={btnStyle}
-					onClick={() => handleExit()}
-					size="small"
-					variant="outlined"
-				>
+				<Button startIcon={<LogoutIcon />} className="button" style={btnStyle} onClick={() => handleExit()} size="small" variant="outlined">
 					Exit
 				</Button>
 			</div>
 
-			<div
-				style={{
-					height: "auto",
-					backgroundColor: "white",
-				}}
-			>
+			<div className="data-grid">
 				<StripedDataGrid
 					rows={products}
 					columns={columns}
@@ -235,9 +210,7 @@ function Products() {
 					checkboxSelection
 					disableRowSelectionOnClick={true}
 					apiRef={apiRef}
-					getRowClassName={(params) =>
-						params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-					}
+					getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd")}
 				></StripedDataGrid>
 			</div>
 			<FormDialog
@@ -247,6 +220,7 @@ function Products() {
 				products={products}
 				label={label}
 				idEditProduct={idEditProduct}
+				className="form-dialog"
 			/>
 		</div>
 	)

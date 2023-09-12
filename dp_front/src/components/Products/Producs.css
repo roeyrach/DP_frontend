@@ -1,0 +1,102 @@
+/* Products.css */
+:root {
+	--main-bg-color: #d4d4d4;
+	--header-bg-color: #989898;
+	--button-hover-bg-color: #eff7ff;
+	--row-even-bg-color: #f2f2f2;
+	--row-odd-bg-color: #ffffff;
+	--header-text-color: #007bff;
+	--deep-blue: #0b3460;
+}
+
+body {
+	background-color: var(--main-bg-color);
+}
+
+/* Reset some default styles */
+h1,
+h2,
+h3,
+p,
+button {
+	font-family: Arial, sans-serif;
+}
+
+/* Main container styles */
+.container {
+	width: 95%;
+	margin: 0 auto;
+	text-align: center;
+}
+
+/* Header styles */
+.header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 20px;
+	background-color: var(--header-text-color);
+	border-radius: 5px 5px 0 0; /* Rounded corners for a modern look */
+	color: white; /* Text color */
+	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Drop shadow for depth */
+	padding-left: 1rem;
+	/* Optional: Center the header horizontally */
+	margin-left: auto;
+	margin-right: auto;
+
+	/* Optional: Add a transition for a subtle hover effect */
+	transition: background-color 0.3s ease;
+}
+
+.button:hover {
+	color: white;
+	background-color: var(--deep-blue) !important;
+}
+/* Data grid styles */
+.data-grid {
+	height: auto;
+	background-color: white;
+}
+
+/* Alternating row colors */
+.data-grid .even {
+	background-color: var(--row-even-bg-color);
+}
+
+.data-grid .odd {
+	background-color: var(--row-odd-bg-color);
+}
+
+/* Data grid header styles */
+.data-grid .super-app-theme--header {
+	color: var(--header-text-color);
+	font-weight: bold !important;
+}
+
+.edit-icon:hover {
+	color: var(--header-text-color) !important;
+}
+
+/* Add this to your CSS file */
+.vegetable {
+	color: green;
+	font-weight: bold;
+}
+
+.fruit {
+	color: rgb(136, 40, 40);
+	font-weight: bold;
+}
+
+.field-crops {
+	color: orange;
+	font-weight: bold;
+}
+
+.sku {
+	text-decoration: underline;
+}
+
+.name {
+	font-weight: bold;
+}

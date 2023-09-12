@@ -5,15 +5,9 @@ import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
 import DialogContentText from "@mui/material/DialogContentText"
 import DialogTitle from "@mui/material/DialogTitle"
+import "./FormDialog.css"
 
-export default function FormDialog({
-	label,
-	open,
-	setIsDialogOpen,
-	setProducts,
-	products,
-	idEditProduct,
-}) {
+export default function FormDialog({ label, open, setIsDialogOpen, setProducts, products, idEditProduct }) {
 	const [name, setName] = useState("")
 	const [sku, setSku] = useState(0)
 	const [description, setDescription] = useState("")
@@ -23,9 +17,7 @@ export default function FormDialog({
 
 	useEffect(() => {
 		if (label === "Edit Product") {
-			const { name, sku, desc, type, date } = products.find(
-				(product) => product.id === idEditProduct
-			)
+			const { name, sku, desc, type, date } = products.find((product) => product.id === idEditProduct)
 			setName(name)
 			setSku(sku)
 			setDescription(desc)
@@ -38,6 +30,7 @@ export default function FormDialog({
 			setType("")
 			setDate(oneWeekAgo.toISOString().slice(0, 10))
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [label, idEditProduct, open])
 
 	// Calculate the date one week ago
@@ -69,9 +62,7 @@ export default function FormDialog({
 		if (label === "Add Product") {
 			setProducts([...products, addedProduct])
 		} else {
-			const productIndex = products.findIndex(
-				(product) => product.id === idEditProduct
-			)
+			const productIndex = products.findIndex((product) => product.id === idEditProduct)
 			if (productIndex !== -1) {
 				const updatedProducts = [...products]
 				updatedProducts[productIndex] = addedProduct
@@ -92,13 +83,7 @@ export default function FormDialog({
 	}
 
 	useEffect(() => {
-		if (
-			name !== "" &&
-			sku > 0 &&
-			type !== "" &&
-			description !== "" &&
-			date !== ""
-		) {
+		if (name !== "" && sku > 0 && type !== "" && description !== "" && date !== "") {
 			setIsSaveBtn(false)
 		} else {
 			setIsSaveBtn(true)
@@ -108,25 +93,12 @@ export default function FormDialog({
 	return (
 		<div>
 			<Dialog open={open}>
-				<DialogTitle>{label}</DialogTitle>
+				<DialogTitle className="dialog-title">{label}</DialogTitle>
 				<DialogContent>
 					<DialogContentText>Fill the fields</DialogContentText>
 					<div>
-						<input
-							value={name}
-							placeholder="Name"
-							type="text"
-							maxLength={50}
-							autoFocus={true}
-							onChange={(e) => setName(e.target.value)}
-						></input>
-						<input
-							value={sku}
-							placeholder="SKU"
-							type="number"
-							min={0}
-							onChange={(e) => setSku(e.target.value)}
-						></input>
+						<input value={name} placeholder="Name" type="text" maxLength={50} autoFocus={true} onChange={(e) => setName(e.target.value)}></input>
+						<input value={sku} placeholder="SKU" type="number" min={0} onChange={(e) => setSku(e.target.value)}></input>
 						<select
 							name="cars"
 							id="cars"
@@ -135,7 +107,7 @@ export default function FormDialog({
 								setType(e.target.value)
 							}}
 						>
-							<option value="" disabled>
+							<option style={{ color: "#007bff" }} value="" disabled>
 								Select a type
 							</option>{" "}
 							{/* Placeholder option */}
