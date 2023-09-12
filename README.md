@@ -4,6 +4,10 @@ After styling:
 
 
 
+https://github.com/roeyrach/DP_frontend/assets/93585090/d6c11add-6679-4626-be5c-8da5b0d401b6
+
+
+
 Welcome to dp_frontend, a React application for managing products.
 
 ## Getting Started
