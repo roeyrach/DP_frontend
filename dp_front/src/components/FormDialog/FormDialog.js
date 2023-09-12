@@ -47,7 +47,7 @@ export default function FormDialog({ label, open, setIsDialogOpen, setProducts, 
 
 	const handleClose = () => {
 		// Close the dialog
-		clearForm()
+		setIsDialogOpen(false)
 	}
 
 	const handleSave = () => {
