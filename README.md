@@ -1,5 +1,9 @@
 # DP_frontend
 
+After styling:
+
+
+
 Welcome to dp_frontend, a React application for managing products.
 
 ## Getting Started
